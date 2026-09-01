@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Risk Manager - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        .button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        
+        .button:hover {
+            background: #764ba2;
+        }
+        
+        .button:active {
+            transform: scale(0.98);
+        }
+        
+        .result {
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result.high-risk {
+            background: #ffe5e5;
+            border-left: 5px solid #ff6b6b;
+        }
+        
+        .result.medium-risk {
+            background: #fff4e5;
+            border-left: 5px solid #ffa500;
+        }
+        
+        .result.low-risk {
+            background: #e5ffe5;
+            border-left: 5px solid #51cf66;
+        }
+        
+        .result h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .result-item {
+            margin: 8px 0;
+            font-size: 1em;
+        }
+        
+        .result-item strong {
+            color: #333;
+        }
+        
+        .risk-meter {
+            width: 100%;
+            height: 30px;
+            background: #ddd;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .risk-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #51cf66, #ffa500, #ff6b6b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .status {
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status.online {
+            background: #e5ffe5;
+            color: #2d5016;
+            border: 2px solid #51cf66;
+        }
+        
+        .status.offline {
+            background: #ffe5e5;
+            color: #5c2e2e;
+            border: 2px solid #ff6b6b;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #ddd;
+        }
+        
+        .metric-box .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .metric-box .label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .example-btn {
+            padding: 8px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+        
+        .example-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .examples {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Risk Manager</h1>
+            <p>Real-time Transaction Risk Scoring</p>
+        </div>
+        
+        <div class="main-grid">
+            <!-- LEFT PANEL: INPUT -->
+            <div class="card">
+                <h2>Score a Transaction</h2>
+                
+                <div class="status" id="status">
+                    <div class="spinner"></div>
+                    <p>Checking API...</p>
+                </div>
+                
+                <div class="form-group">
+                    <label>Transaction ID</label>
+                    <input type="text" id="transaction_id" value="TXN-001" placeholder="TXN-001">
+                </div>
+                
+                <div class="form-group">
+                    <label>Account Age (days)</label>
+                    <input type="number" id="account_age_days" value="5" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label>Lifetime Orders</label>
+                    <input type="number" id="lifetime_orders" value="1" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label>Order Amount (₹)</label>
+                    <input type="number" id="order_amount" value="25000" min="0" step="100">
+                </div>
+                
+                <div class="form-group">
+                    <label>Product Category</label>
+                    <select id="product_category">
+                        <option value="electronics">Electronics (High Risk)</option>
+                        <option value="apparel">Apparel (High Risk)</option>
+                        <option value="books">Books (Low Risk)</option>
+                        <option value="home">Home (Medium Risk)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Previous Returns Count</label>
+                    <input type="number" id="previous_returns_count" value="0" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label>Order Velocity (24h)</label>
+                    <input type="number" id="order_velocity_24h" value="2" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select id="payment_method">
+                        <option value="credit_card">Credit Card</option>
+                        <option value="debit_card">Debit Card</option>
+                        <option value="upi">UPI</option>
+                    </select>
+                </div>
+                
+                <button class="button" onclick="scoreTransaction()">Score Transaction</button>
+                
+                <div style="margin-top: 20px;">
+                    <p style="margin-bottom: 10px; font-weight: bold; color: #333;">Quick Examples:</p>
+                    <div class="examples">
+                        <button class="example-btn" onclick="loadExample('high')">High-Risk</button>
+                        <button class="example-btn" onclick="loadExample('medium')">Medium-Risk</button>
+                        <button class="example-btn" onclick="loadExample('low')">Low-Risk</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RIGHT PANEL: RESULTS -->
+            <div class="card">
+                <h2>Risk Assessment Result</h2>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing transaction...</p>
+                </div>
+                
+                <div id="result" class="result"></div>
+                
+                <div class="metrics-grid" id="metrics" style="display:none;">
+                    <div class="metric-box">
+                        <div class="label">Model Precision</div>
+                        <div class="value">62%</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="label">Model Recall</div>
+                        <div class="value">75%</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="label">False Positives</div>
+                        <div class="value">5%</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="label">Monthly ROI</div>
+                        <div class="value">₹1.35M</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FULL WIDTH: INFO -->
+        <div class="card">
+            <h2>ℹ️ How It Works</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 10px;">🟢 Low Risk (0-40%)</h3>
+                    <p>Process normally. Established customer, normal purchase pattern.</p>
+                </div>
+                <div>
+                    <h3 style="color: #ffa500; margin-bottom: 10px;">🟡 Medium Risk (40-60%)</h3>
+                    <p>Monitor closely. Some risk factors detected, may proceed.</p>
+                </div>
+                <div>
+                    <h3 style="color: #ff6b6b; margin-bottom: 10px;">🔴 High Risk (60-100%)</h3>
+                    <p>Require verification. New customer or risky patterns detected.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:5000';
+        
+        // Check API health on load
+        window.addEventListener('load', function() {
+            checkApiHealth();
+        });
+        
+        function checkApiHealth() {
+            fetch(`${API_URL}/health`)
+                .then(res => res.json())
+                .then(data => {
+                    const status = document.getElementById('status');
+                    status.innerHTML = `
+                        <div style="color: #2d5016; font-weight: bold;">
+                             API is Online - Model Ready
+                        </div>
+                    `;
+                    status.className = 'status online';
+                    document.getElementById('metrics').style.display = 'grid';
+                })
+                .catch(err => {
+                    const status = document.getElementById('status');
+                    status.innerHTML = `
+                        <div style="color: #5c2e2e; font-weight: bold;">
+                            ❌ API is Offline - Check if app.py is running
+                        </div>
+                    `;
+                    status.className = 'status offline';
+                });
+        }
+        
+        function loadExample(type) {
+            if (type === 'high') {
+                document.getElementById('account_age_days').value = '5';
+                document.getElementById('lifetime_orders').value = '1';
+                document.getElementById('order_amount').value = '25000';
+                document.getElementById('product_category').value = 'electronics';
+                document.getElementById('previous_returns_count').value = '0';
+                document.getElementById('order_velocity_24h').value = '2';
+                document.getElementById('payment_method').value = 'credit_card';
+            } else if (type === 'medium') {
+                document.getElementById('account_age_days').value = '60';
+                document.getElementById('lifetime_orders').value = '5';
+                document.getElementById('order_amount').value = '5000';
+                document.getElementById('product_category').value = 'apparel';
+                document.getElementById('previous_returns_count').value = '1';
+                document.getElementById('order_velocity_24h').value = '1';
+                document.getElementById('payment_method').value = 'debit_card';
+            } else if (type === 'low') {
+                document.getElementById('account_age_days').value = '340';
+                document.getElementById('lifetime_orders').value = '15';
+                document.getElementById('order_amount').value = '850';
+                document.getElementById('product_category').value = 'books';
+                document.getElementById('previous_returns_count').value = '0';
+                document.getElementById('order_velocity_24h').value = '0';
+                document.getElementById('payment_method').value = 'credit_card';
+            }
+            scoreTransaction();
+        }
+        
+        function scoreTransaction() {
+            const data = {
+                transaction_id: document.getElementById('transaction_id').value,
+                account_age_days: parseFloat(document.getElementById('account_age_days').value),
+                lifetime_orders: parseInt(document.getElementById('lifetime_orders').value),
+                order_amount: parseFloat(document.getElementById('order_amount').value),
+                product_category: document.getElementById('product_category').value,
+                previous_returns_count: parseInt(document.getElementById('previous_returns_count').value),
+                order_velocity_24h: parseInt(document.getElementById('order_velocity_24h').value),
+                payment_method: document.getElementById('payment_method').value,
+                ip_country_match: 1,
+                merchant_id: 'demo'
+            };
+            
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            
+            fetch(`${API_URL}/score`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(response => {
+                loading.style.display = 'none';
+                
+                const riskValue = parseFloat(response.risk_probability);
+                let riskClass = 'low-risk';
+                let emoji = '🟢';
+                
+                if (riskValue >= 60) {
+                    riskClass = 'high-risk';
+                    emoji = '🔴';
+                } else if (riskValue >= 40) {
+                    riskClass = 'medium-risk';
+                    emoji = '🟡';
+                }
+                
+                const meterWidth = riskValue;
+                
+                result.className = `result ${riskClass}`;
+                result.innerHTML = `
+                    <h3>${emoji} ${response.decision}</h3>
+                    <div class="risk-meter">
+                        <div class="risk-fill" style="width: ${meterWidth}%;">
+                            ${response.risk_probability}
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <strong>Risk Probability:</strong> ${response.risk_probability}
+                    </div>
+                    <div class="result-item">
+                        <strong>Policy:</strong> ${response.policy}
+                    </div>
+                    <div class="result-item">
+                        <strong>Action:</strong> ${response.action}
+                    </div>
+                    <div class="result-item" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ccc;">
+                        <strong>Recommendation:</strong> ${response.recommendation}
+                    </div>
+                `;
+                result.style.display = 'block';
+            })
+            .catch(err => {
+                loading.style.display = 'none';
+                result.className = 'result low-risk';
+                result.innerHTML = `
+                    <h3>❌ Error</h3>
+                    <p>Could not connect to API. Make sure app.py is running.</p>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                        Error: ${err.message}
+                    </p>
+                `;
+                result.style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>

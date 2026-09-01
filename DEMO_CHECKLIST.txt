@@ -1,0 +1,62 @@
+BUILDATHON DEMO DAY - CHECKLIST
+================================
+
+BEFORE DEMO:
+□ Laptop fully charged
+□ Terminal 1: python app.py (running)
+□ Terminal 2: Ready for commands
+□ Postman open with /score request ready
+□ Backup: Postman collection exported (.json)
+□ README.md visible
+□ evaluation_report.txt ready to show
+□ confusion_matrix.png ready to show
+
+DEMO SEQUENCE (5 minutes):
+□ Show health check: GET /health
+   "Model loaded, 12 features, ready to score"
+   
+□ Show demo endpoint: GET /demo
+   "Example scoring logic"
+   
+□ POST /score (HIGH-RISK)
+   Input: TXN-001, new customer, ₹25K electronics
+   Output: 62.6% risk, FRICTION policy
+   Say: "This customer needs verification"
+   
+□ POST /score (LOW-RISK)
+   Input: TXN-002, established customer, ₹850 books
+   Output: 3.6% risk, PROCESS policy
+   Say: "This customer processes normally"
+   
+□ POST /batch
+   Input: Multiple transactions
+   Output: Summary (1 high-risk, 1 low-risk)
+   Say: "Can score in batches for volume"
+
+□ Show metrics: GET /metrics
+   "Precision 62%, Recall 75%, ROI ₹1.35M/month"
+
+□ Show evaluation_report.txt
+   "This is our honest assessment on unseen data"
+
+□ Show confusion_matrix.png
+   "This shows what we got right/wrong"
+
+Q&A PREP:
+□ Q: How accurate?
+  A: 62% precision, 75% recall on unseen test data
+  
+□ Q: What if wrong?
+  A: 5% false-positive rate acceptable, merchants can override
+  
+□ Q: How to scale?
+  A: Already built, need Razorpay data + integration support
+  
+□ Q: Timeline?
+  A: API ready now, can integrate in 1-2 weeks
+  
+□ Q: Business case?
+  A: ₹1.35M/month per merchant, ₹135Cr for 100 merchants
+  
+□ Q: Is it safe?
+  A: Defense-only, full audit trail, no offensive capabilities
