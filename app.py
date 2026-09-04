@@ -1,5 +1,3 @@
-# app.py - Flask API for Return-Risk Scorer
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pickle as pkl
@@ -11,7 +9,7 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-print("🚀 Loading model and data...")
+print(" Loading model and data...")
 
 # Load trained model
 with open('return_risk_model.pkl', 'rb') as f:
@@ -290,9 +288,7 @@ def demo():
 # ============================================================================
 
 if __name__ == '__main__':
-    print("\n" + "=" * 70)
     print("🚀 AI RISK MANAGER API - RUNNING")
-    print("=" * 70)
     print(f"\n Model loaded (Precision: 62%, Recall: 75%)")
     print(f" Server starting on http://localhost:5000")
     print(f" CORS enabled (browser access allowed)")
@@ -303,7 +299,6 @@ if __name__ == '__main__':
     print(f"  GET  /metrics         → Model performance")
     print(f"  GET  /audit           → Audit log")
     print(f"  GET  /demo            → Demo transaction")
-    print(f"\n" + "=" * 70)
     print(f"Ready to accept predictions!\n")
     
     app.run(debug=True, port=5000)

@@ -1,0 +1,48 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "AI Risk Manager API",
+    "version": "1.0.0",
+    "description": "Real-time transaction risk scoring"
+  },
+  "host": "localhost:5000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "responses": {
+          "200": {
+            "description": "API is healthy"
+          }
+        }
+      }
+    },
+    "/score": {
+      "post": {
+        "summary": "Score a transaction",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "transaction_id": {"type": "string"},
+                "account_age_days": {"type": "number"},
+                "order_amount": {"type": "number"}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Risk score returned"
+          }
+        }
+      }
+    }
+  }
+}
